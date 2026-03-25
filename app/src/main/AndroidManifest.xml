@@ -2,7 +2,7 @@
 
     <application
         android:label="DS Modem Simulator"
-        android:theme="@android:style/Theme.Black.NoTitleBar">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         <activity
             android:name=".MainActivity"
