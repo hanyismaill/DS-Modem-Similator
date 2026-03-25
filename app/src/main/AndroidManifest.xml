@@ -3,13 +3,16 @@
 
     <application
         android:label="iDIRECT Modem Virtualization"
-        android:theme="@android:style/Theme.Black.NoTitleBar">
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true">
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
 
     </application>
