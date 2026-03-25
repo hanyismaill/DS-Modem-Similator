@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup JDK
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
@@ -20,11 +20,18 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    # 🔥 THIS IS THE FIX
+    - name: Generate Gradle Wrapper
+      run: gradle wrapper --gradle-version 8.5
+
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+
     - name: Build APK
-      run: gradle assembleDebug
+      run: ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: modem-apk
+        name: app
         path: app/build/outputs/apk/debug/app-debug.apk
