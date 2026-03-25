@@ -1,3 +1,27 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.ds.modem'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.ds.modem"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        debug {}
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 }
