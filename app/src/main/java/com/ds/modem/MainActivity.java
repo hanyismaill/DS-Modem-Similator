@@ -4,17 +4,22 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView screen;
     EditText input;
 
-    int stage = 0; // 0=username, 1=password, 2=CLI
-    String username = "";
+    int stage = 0;
+    String username = "admin";
+
+    Random random = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,22 +28,21 @@ public class MainActivity extends AppCompatActivity {
         screen = new TextView(this);
         input = new EditText(this);
 
-        screen.setTextSize(16);
-        input.setHint("");
+        screen.setTextSize(14);
+        input.setSingleLine(true);
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
         layout.addView(screen);
         layout.addView(input);
 
         setContentView(layout);
 
-        // Start directly like modem
         screen.setText("Username: ");
 
-        input.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+        input.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
 
                 String text = input.getText().toString().trim();
                 input.setText("");
@@ -55,62 +59,49 @@ public class MainActivity extends AppCompatActivity {
 
     private void processInput(String text) {
 
+        screen.append(text + "\n");
+
         if (stage == 0) {
-            username = text;
-            screen.append(username + "\nPassword: ");
+            screen.append("Password: ");
             stage = 1;
 
         } else if (stage == 1) {
-            screen.append("****\n");
-
-            if (username.equals("admin") && text.equals("admin")) {
-                screen.append("\n");
-                stage = 2;
-                showPrompt();
-            } else {
-                screen.append("\nAccess Denied\n\nUsername: ");
-                stage = 0;
-            }
+            screen.append("********\n\n");
+            stage = 2;
+            printHeader();
 
         } else if (stage == 2) {
             handleCommand(text);
         }
     }
 
+    private void printHeader() {
+        int session = 10000 + random.nextInt(90000);
+
+        screen.append("[RMT:" + session + "] admin@telnet:127.0.0.1;4494\n");
+        screen.append("> ");
+    }
+
     private void handleCommand(String cmd) {
 
         cmd = cmd.toLowerCase();
 
-        screen.append(cmd + "\n");
+        if (cmd.equals("rx power")) {
+            screen.append("Rx Power: -66.830002\n\n");
 
-        switch (cmd) {
+        } else if (cmd.equals("rx snr")) {
+            screen.append("Rx SNR: 11.930000\n\n");
 
-            case "rx snr":
-                screen.append("12.5 dB\n");
-                break;
+        } else if (cmd.equals("rx freq")) {
+            screen.append("Rx Frequency = 1100.0000 MHz\n\n");
 
-            case "tx power":
-                screen.append("3.2 dBm\n");
-                break;
+        } else if (cmd.equals("tx freq")) {
+            screen.append("Tx Frequency = 1800.0000 MHz\n\n");
 
-            case "sn":
-                screen.append("DS-123456\n");
-                break;
-
-            case "clear":
-                screen.setText("");
-                showPrompt();
-                return;
-
-            default:
-                screen.append("Invalid command\n");
-                break;
+        } else {
+            screen.append("Unknown Command: '" + cmd + "'\n\n");
         }
 
-        showPrompt();
-    }
-
-    private void showPrompt() {
-        screen.append("> ");
+        printHeader(); // IMPORTANT: repeat header every time
     }
 }
